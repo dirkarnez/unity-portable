@@ -10,7 +10,7 @@ jobs:
     name: Create Release
     runs-on: windows-latest
     env:
-      targetZip: openifcviewer-portable-${{ github.ref_name }}.zip
+      target: unity-portable-${{ github.ref_name }}
     steps:
       - uses: actions/checkout@v4
       
@@ -22,17 +22,14 @@ jobs:
       - shell: cmd
         run: |
           .\installer.exe /S /D=%cd%\installation
-          
-      - name: Archive Release
-        uses: thedoctor0/zip-release@master
-        with:
-          type: 'zip'
-          directory: "installation"
-          filename: "${{ env.targetZip }}"
+
+      - shell: cmd
+        run: |
+          7z a -tzip -v100m ${{ env.target }} installation
           
       - name: Release prebuilt
         uses: ncipollo/release-action@v1
         with:
-          artifacts: "installation/${{ env.targetZip }}"
+          artifacts: "${{ env.target }}.zip.*"
           allowUpdates: true
           token: ${{ secrets.GITHUB_TOKEN }}
